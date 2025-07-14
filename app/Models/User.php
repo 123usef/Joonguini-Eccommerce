@@ -42,4 +42,28 @@ class User extends \TCG\Voyager\Models\User
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function carts()
+{
+    return $this->hasMany(Cart::class);
+}
+
+public function orders()
+{
+    return $this->hasMany(Order::class);
+}
+
+// Helper method to get cart total
+public function getCartTotalAttribute()
+{
+    return $this->carts->sum(function ($item) {
+        return $item->quantity * $item->product->price;
+    });
+}
+
+// Helper method to get cart items count
+public function getCartCountAttribute()
+{
+    return $this->carts->sum('quantity');
+}
 }
