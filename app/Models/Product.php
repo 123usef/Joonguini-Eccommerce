@@ -21,10 +21,11 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'price' => 'decimal:3',
         'is_active' => 'boolean',
     ];
 
+    
     // Relationships
     public function category()
     {
