@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class Staticcontroller extends Controller
+class StaticController extends Controller
 {
-    public function PrivacyPolicy(){
+    public function privacyPolicy(){
         return view('static.privacy-policy');
     }
 
-    public function TermsOfService(){
+    public function termsOfService(){
         return view('static.terms-of-service');
     }
 

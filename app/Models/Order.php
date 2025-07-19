@@ -21,7 +21,7 @@ class Order extends Model
     ];
 
     protected $casts = [
-        'total_amount' => 'decimal:2',
+        'total_amount' => 'decimal:3',
     ];
 
     // Boot method to generate order number
@@ -54,5 +54,29 @@ class Order extends Model
     public function scopeCompleted($query)
     {
         return $query->where('status', 'completed');
+    }
+
+    // Helper methods
+    public function getFormattedTotalAttribute()
+    {
+        return number_format($this->total_amount, 3) . ' OMR';
+    }
+
+    public function getStatusColorAttribute()
+    {
+        $colors = [
+            'pending' => 'warning',
+            'processing' => 'info',
+            'completed' => 'success',
+            'cancelled' => 'danger',
+            'refunded' => 'secondary'
+        ];
+        
+        return $colors[$this->status] ?? 'primary';
+    }
+
+    public function getTotalItemsAttribute()
+    {
+        return $this->orderItems->sum('quantity');
     }
 }
