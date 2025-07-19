@@ -18,8 +18,8 @@ class OrderItem extends Model
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'total' => 'decimal:2',
+        'price' => 'decimal:3',
+        'total' => 'decimal:3',
     ];
 
     // Boot method to calculate total
@@ -45,5 +45,16 @@ class OrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    // Helper methods
+    public function getFormattedPriceAttribute()
+    {
+        return number_format($this->price, 3) . ' OMR';
+    }
+
+    public function getFormattedTotalAttribute()
+    {
+        return number_format($this->total, 3) . ' OMR';
     }
 }
