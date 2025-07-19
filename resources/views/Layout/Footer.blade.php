@@ -13,7 +13,7 @@
                 <ul class="list-unstyled">
                     <li><a href="{{ route('index') }}" class="text-light text-decoration-none">Home</a></li>
                     <li><a href="{{ route('products') }}" class="text-light text-decoration-none">Products</a></li>
-                    <li><a href="{{ route('cart') }}" class="text-light text-decoration-none">Cart</a></li>
+                    <li><a href="{{ route('cart.index') }}" class="text-light text-decoration-none">Cart</a></li>
                     @auth
                     <li><a href="#" class="text-light text-decoration-none">My Account</a></li>
                     @else

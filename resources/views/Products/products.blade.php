@@ -210,8 +210,91 @@
         <!-- Pagination -->
         @if($products->hasPages())
         <div class="row mt-4">
-            <div class="col-12 d-flex justify-content-center">
-                {{ $products->links() }}
+            <div class="col-12">
+                <nav aria-label="Products pagination">
+                    <ul class="pagination justify-content-center">
+                        {{-- Previous Page Link --}}
+                        @if ($products->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $products->appends(request()->query())->previousPageUrl() }}" rel="prev">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Elements --}}
+                        @php
+                            $start = $products->currentPage() - 2;
+                            $end = $products->currentPage() + 2;
+                            
+                            if($start < 1) {
+                                $start = 1;
+                                $end += 1;
+                            }
+                            
+                            if($end >= $products->lastPage()) {
+                                $end = $products->lastPage();
+                            }
+                        @endphp
+
+                        @if($start > 1)
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $products->appends(request()->query())->url(1) }}">1</a>
+                            </li>
+                            @if($start > 2)
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            @endif
+                        @endif
+
+                        @for($i = $start; $i <= $end; $i++)
+                            <li class="page-item {{ ($products->currentPage() == $i) ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $products->appends(request()->query())->url($i) }}">{{ $i }}</a>
+                            </li>
+                        @endfor
+
+                        @if($end < $products->lastPage())
+                            @if($end < $products->lastPage() - 1)
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            @endif
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $products->appends(request()->query())->url($products->lastPage()) }}">{{ $products->lastPage() }}</a>
+                            </li>
+                        @endif
+
+                        {{-- Next Page Link --}}
+                        @if ($products->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $products->appends(request()->query())->nextPageUrl() }}" rel="next">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
+                
+                {{-- Page Info --}}
+                <div class="text-center text-muted mt-3">
+                    <small>
+                        Page {{ $products->currentPage() }} of {{ $products->lastPage() }} | 
+                        Total: {{ $products->total() }} products
+                    </small>
+                </div>
             </div>
         </div>
         @endif
@@ -228,3 +311,65 @@
     @endif
 </div>
 @endsection
+
+@push('styles')
+<style>
+    /* Enhanced Pagination Styling */
+    .pagination {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .pagination .page-link {
+        color: #0066cc;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem 0.75rem;
+        margin: 0 2px;
+        border-radius: 0.25rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #f8f9fa;
+        color: #0056b3;
+        border-color: #0066cc;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #0066cc;
+        border-color: #0066cc;
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,102,204,0.3);
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+    
+    .pagination .page-item:first-child .page-link {
+        border-radius: 0.375rem;
+    }
+    
+    .pagination .page-item:last-child .page-link {
+        border-radius: 0.375rem;
+    }
+    
+    /* Mobile responsive pagination */
+    @media (max-width: 576px) {
+        .pagination .page-link {
+            padding: 0.375rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .pagination .page-item .page-link i {
+            display: none;
+        }
+    }
+</style>
+@endpush

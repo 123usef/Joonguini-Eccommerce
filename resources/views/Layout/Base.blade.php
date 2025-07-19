@@ -13,6 +13,80 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        
+        <!-- Custom Navbar Styles -->
+        <style>
+            /* Remove spacing between navbar and content */
+            .navbar {
+                margin-bottom: 0 !important;
+                padding: 0.75rem 0;
+                transition: all 0.3s ease;
+            }
+            
+            main {
+                padding-top: 0 !important;
+            }
+            
+            /* Navbar hover effects */
+            .nav-hover {
+                position: relative;
+                transition: all 0.3s ease;
+            }
+            
+            .nav-hover:hover {
+                background-color: rgba(102, 126, 234, 0.1);
+                transform: translateY(-2px);
+            }
+            
+            /* Cart badge animation */
+            #cart-count {
+                animation: bounce 0.3s ease;
+            }
+            
+            @keyframes bounce {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.2); }
+            }
+            
+            /* Button hover effects */
+            .btn-hover {
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .btn-hover:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            }
+            
+            /* Dropdown improvements */
+            .dropdown-menu {
+                border: none;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+                margin-top: 10px;
+            }
+            
+            /* Navbar on scroll */
+            .navbar.scrolled {
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+                padding: 0.5rem 0;
+            }
+            
+            /* Mobile responsive */
+            @media (max-width: 768px) {
+                .navbar-brand span {
+                    font-size: 1.2rem !important;
+                }
+                
+                .navbar {
+                    padding: 0.5rem 0;
+                }
+            }
+        </style>
+        
+        @stack('styles')
     </head>
     <body class="d-flex flex-column min-vh-100">
                 <!-- Nav Bar Include  -->
@@ -28,6 +102,21 @@
 
                 <!-- Scripts -->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+                
+                <!-- Navbar Scroll Effect -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const navbar = document.querySelector('.navbar');
+                        
+                        window.addEventListener('scroll', function() {
+                            if (window.scrollY > 50) {
+                                navbar.classList.add('scrolled');
+                            } else {
+                                navbar.classList.remove('scrolled');
+                            }
+                        });
+                    });
+                </script>
                 
                 <!-- Cart JavaScript Functions -->
                 <script>

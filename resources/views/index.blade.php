@@ -2,7 +2,7 @@
 
 @section('content')
 <!-- Hero Section with Slider -->
-<section class="hero-section">
+<section class="hero-section position-relative">
     <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
@@ -272,14 +272,106 @@
 @push('styles')
 <style>
 /* Hero Section Styles */
+.hero-section {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
 .hero-slide {
-    min-height: 500px;
+    height: 500px; /* Fixed height for all slides */
     display: flex;
     align-items: center;
+    justify-content: center;
+    position: relative;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+}
+
+.carousel-inner {
+    height: 500px; /* Match the slide height exactly */
+}
+
+.carousel-item {
+    height: 500px; /* Explicit height for each item */
 }
 
 .min-vh-50 {
-    min-height: 50vh;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    min-height: unset;
+}
+
+/* Enhanced carousel indicators */
+.carousel-indicators {
+    bottom: 20px;
+}
+
+.carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.carousel-indicators button.active {
+    opacity: 1;
+    transform: scale(1.2);
+    background-color: white;
+}
+
+/* Enhanced carousel controls */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 60px;
+    height: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.carousel-control-prev {
+    left: 20px;
+}
+
+.carousel-control-next {
+    right: 20px;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Text animations */
+.hero-slide h1 {
+    animation: slideInFromLeft 1s ease-out;
+}
+
+.hero-slide p {
+    animation: slideInFromLeft 1s ease-out 0.2s both;
+}
+
+.hero-slide .btn {
+    animation: slideInFromLeft 1s ease-out 0.4s both;
+}
+
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 /* Category Card Hover Effects */
@@ -376,16 +468,42 @@
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-    .hero-slide {
-        min-height: 400px;
+    .hero-slide,
+    .carousel-inner {
+        height: 400px; /* Smaller fixed height for mobile */
     }
     
     .display-4 {
         font-size: 2rem;
     }
     
+    .lead {
+        font-size: 1rem; /* Smaller text on mobile */
+    }
+    
     .display-5 {
         font-size: 1.5rem;
+    }
+    
+    /* Hide icons on mobile for more content space */
+    .hero-slide .col-lg-6.text-center {
+        display: none;
+    }
+    
+    /* Center content on mobile */
+    .hero-slide .col-lg-6.text-white {
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-slide,
+    .carousel-inner {
+        height: 350px; /* Even smaller for very small screens */
+    }
+    
+    .display-4 {
+        font-size: 1.75rem;
     }
 }
 
