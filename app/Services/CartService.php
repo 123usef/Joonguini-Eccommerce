@@ -45,7 +45,7 @@ class CartService
             // Test Redis connection
             $this->redis->ping();
         } catch (\Exception $e) {
-            Log::error('Redis connection failed: ' . $e->getMessage());
+            Log::warning('Redis connection failed, using database fallback: ' . $e->getMessage());
             // Fallback to database if Redis fails
             $this->redis = null;
         }
@@ -61,8 +61,18 @@ class CartService
         if (Auth::check()) {
             $this->cartKey = 'cart:user:' . Auth::id();
         } else {
+            // Ensure session is started
+            if (!session()->isStarted()) {
+                session()->start();
+            }
+            
             // Use session ID for guest carts
             $sessionId = session()->getId();
+            if (empty($sessionId)) {
+                // Generate a new session ID if none exists
+                session()->regenerate();
+                $sessionId = session()->getId();
+            }
             $this->cartKey = 'cart:guest:' . $sessionId;
         }
     }
@@ -94,11 +104,6 @@ class CartService
 
         $cart[$productId] = $newQuantity;
         $this->saveCart($cart);
-        
-        // Sync with database for authenticated users
-        if (Auth::check()) {
-            $this->syncCartToDatabase($productId, $newQuantity);
-        }
         
         return [
             'success' => true,
@@ -163,11 +168,6 @@ class CartService
         $cart = $this->getCart();
         $cart[$productId] = $quantity;
         $this->saveCart($cart);
-        
-        // Sync with database for authenticated users
-        if (Auth::check()) {
-            $this->syncCartToDatabase($productId, $quantity);
-        }
 
         return [
             'success' => true,
@@ -182,17 +182,49 @@ class CartService
      */
     private function getCart()
     {
+        // For guests, use session directly when Redis is not available or fails
+        if (!Auth::check()) {
+            // Try Redis first
+            if ($this->redis) {
+                try {
+                    $cart = $this->redis->get($this->cartKey);
+                    if ($cart !== false && $cart !== null) {
+                        return json_decode($cart, true);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Redis get failed for guest: ' . $e->getMessage());
+                }
+            }
+            // Fallback to session for guests
+            return session()->get('cart', []);
+        }
+        
+        // For authenticated users, try Redis first, then database
         if ($this->redis) {
             try {
                 $cart = $this->redis->get($this->cartKey);
-                return $cart ? json_decode($cart, true) : [];
+                if ($cart !== false && $cart !== null) {
+                    return json_decode($cart, true);
+                }
+                // If Redis returns null/false, try to load from database and populate Redis
+                $dbCart = $this->getCartFromDatabase();
+                if (!empty($dbCart)) {
+                    // Populate Redis with database data
+                    try {
+                        $this->redis->setex($this->cartKey, $this->ttl, json_encode($dbCart));
+                    } catch (\Exception $e) {
+                        Log::error('Failed to populate Redis from DB: ' . $e->getMessage());
+                    }
+                }
+                return $dbCart;
             } catch (\Exception $e) {
                 Log::error('Redis get failed: ' . $e->getMessage());
-                return $this->getCartFromFallback();
+                return $this->getCartFromDatabase();
             }
         }
         
-        return $this->getCartFromFallback();
+        // Redis not available, use database directly
+        return $this->getCartFromDatabase();
     }
 
     /**
@@ -200,6 +232,26 @@ class CartService
      */
     private function saveCart($cart)
     {
+        // For guests, always save to session as well
+        if (!Auth::check()) {
+            session()->put('cart', $cart);
+            
+            // Also try to save to Redis if available
+            if ($this->redis) {
+                try {
+                    if (empty($cart)) {
+                        $this->redis->del($this->cartKey);
+                    } else {
+                        $this->redis->setex($this->cartKey, $this->ttl, json_encode($cart));
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Redis save failed for guest: ' . $e->getMessage());
+                }
+            }
+            return;
+        }
+        
+        // For authenticated users, use Redis with fallback
         if ($this->redis) {
             try {
                 if (empty($cart)) {
@@ -207,13 +259,46 @@ class CartService
                 } else {
                     $this->redis->setex($this->cartKey, $this->ttl, json_encode($cart));
                 }
-                return;
             } catch (\Exception $e) {
                 Log::error('Redis save failed: ' . $e->getMessage());
             }
         }
         
-        $this->saveCartToFallback($cart);
+        // Always sync to database for authenticated users
+        if (Auth::check()) {
+            // Sync all cart items to database
+            foreach ($cart as $productId => $quantity) {
+                $this->syncCartToDatabase($productId, $quantity);
+            }
+            
+            // Remove items that are no longer in cart
+            if (empty($cart)) {
+                // If cart is empty, remove all items for this user
+                CartModel::where('user_id', Auth::id())->delete();
+            } else {
+                // Remove items that are no longer in cart
+                CartModel::where('user_id', Auth::id())
+                    ->whereNotIn('product_id', array_keys($cart))
+                    ->delete();
+            }
+        }
+    }
+
+    /**
+     * Get cart from database for authenticated users
+     */
+    private function getCartFromDatabase()
+    {
+        if (!Auth::check()) {
+            return [];
+        }
+        
+        $cartItems = CartModel::where('user_id', Auth::id())->get();
+        $cart = [];
+        foreach ($cartItems as $item) {
+            $cart[$item->product_id] = $item->quantity;
+        }
+        return $cart;
     }
 
     /**
@@ -222,12 +307,7 @@ class CartService
     private function getCartFromFallback()
     {
         if (Auth::check()) {
-            $cartItems = CartModel::where('user_id', Auth::id())->get();
-            $cart = [];
-            foreach ($cartItems as $item) {
-                $cart[$item->product_id] = $item->quantity;
-            }
-            return $cart;
+            return $this->getCartFromDatabase();
         }
         
         return session()->get('cart', []);
@@ -420,7 +500,7 @@ class CartService
      */
     public function loadCartFromDatabase()
     {
-        if (Auth::check() && $this->redis) {
+        if (Auth::check()) {
             $cartItems = CartModel::where('user_id', Auth::id())->get();
             $cart = [];
             
@@ -428,13 +508,19 @@ class CartService
                 $cart[$item->product_id] = $item->quantity;
             }
             
-            if (!empty($cart)) {
+            // Only try to save to Redis if it's available
+            if (!empty($cart) && $this->redis) {
                 try {
                     $this->redis->setex($this->cartKey, $this->ttl, json_encode($cart));
                 } catch (\Exception $e) {
                     Log::error('Redis load from DB failed: ' . $e->getMessage());
                 }
             }
+            
+            // Return the cart for direct use when Redis is not available
+            return $cart;
         }
+        
+        return [];
     }
 }

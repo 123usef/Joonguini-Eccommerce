@@ -224,6 +224,7 @@ return [
 
     'media' => [
         // The allowed mimetypes to be uploaded through the media-manager.
+        //'max_upload_size' => 5 MB
         // 'allowed_mimetypes' => '*', //All types can be uploaded
         'allowed_mimetypes' => [
           'image/jpeg',

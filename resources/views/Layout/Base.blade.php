@@ -459,7 +459,12 @@
                             
                             Cart.add(productId, quantity).then(data => {
                                 if (data.success) {
-                                    Cart.getCartData(); // Refresh dropdown
+                                    // Cart count is already updated by the add response
+                                    // Only refresh dropdown if cart dropdown is currently open
+                                    const cartDropdown = document.querySelector('.dropdown-menu.show');
+                                    if (cartDropdown) {
+                                        Cart.getCartData();
+                                    }
                                 }
                             }).finally(() => {
                                 // Re-enable button
