@@ -72,8 +72,8 @@ Route::get('/terms-of-service', [StaticController::class, 'termsOfService'])->na
 // Cart routes
 Route::get('/cart', [CartController::class, 'show'])->name('cart.index');
 
-// Protected Routes
-Route::middleware(['auth', 'verified'])->group(function () {
+// Protected Routes (Email verification temporarily disabled)
+Route::middleware(['auth'])->group(function () {
     // Checkout routes
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
