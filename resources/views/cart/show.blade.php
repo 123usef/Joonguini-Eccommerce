@@ -23,11 +23,11 @@
                             <div class="border-bottom p-3" id="cart-item-{{ $item['product']->id }}">
                                 <div class="row align-items-center">
                                     <div class="col-md-2">
-                                        <img src="{{ $item['product']->image_url }}" 
+                                        <img src="{{ $item['product']->image_url ?: '/images/placeholder-product.svg' }}" 
                                              alt="{{ $item['product']->name }}" 
                                              class="img-fluid rounded" 
                                              style="max-height: 80px; width: 80px; object-fit: cover;"
-                                             onerror="this.src='{{ \App\Services\ImageService::getPlaceholderUrl('product', 80, 80) }}'">
+                                             onerror="this.src='/images/placeholder-product.svg'">
                                     </div>
                                     
                                     <div class="col-md-4">

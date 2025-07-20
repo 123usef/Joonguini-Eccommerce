@@ -152,11 +152,13 @@
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="card product-card h-100 shadow-sm border-0">
                         <div class="position-relative overflow-hidden">
-                            <img src="{{ $product->image_url }}" 
-                                 alt="{{ $product->name }}" 
-                                 class="card-img-top product-image" 
-                                 style="height: 250px; object-fit: cover;"
-                                 onerror="this.src='{{ \App\Services\ImageService::getPlaceholderUrl('product', 400, 250) }}'">
+                            <a href="{{ route('products.show', $product->slug) }}">
+                                <img src="{{ $product->image_url ?: '/images/placeholder-product.jpg' }}" 
+                                     alt="{{ $product->name }}" 
+                                     class="card-img-top product-image" 
+                                     style="height: 250px; object-fit: cover;"
+                                     onerror="this.src='/images/placeholder-product.jpg'">
+                            </a>
                             
                             <!-- Product Overlay -->
                             <div class="product-overlay">
@@ -183,7 +185,11 @@
                         </div>
                         
                         <div class="card-body d-flex flex-column">
-                            <h6 class="card-title">{{ $product->name }}</h6>
+                            <h6 class="card-title">
+                                <a href="{{ route('products.show', $product->slug) }}" class="text-decoration-none text-dark">
+                                    {{ $product->name }}
+                                </a>
+                            </h6>
                             <p class="card-text text-muted small flex-grow-1">
                                 {{ Str::limit($product->description, 100) }}
                             </p>

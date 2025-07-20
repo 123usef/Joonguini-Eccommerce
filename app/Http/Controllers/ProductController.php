@@ -84,4 +84,22 @@ class ProductController extends Controller
         
         return view('Products.products', compact('products', 'categories', 'priceRange'));
     }
+
+    public function show($slug)
+    {
+        $product = Product::where('slug', $slug)
+            ->where('is_active', true)
+            ->with('category')
+            ->firstOrFail();
+
+        // Get related products from the same category
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->where('is_active', true)
+            ->inStock()
+            ->take(4)
+            ->get();
+
+        return view('Products.show', compact('product', 'relatedProducts'));
+    }
 }

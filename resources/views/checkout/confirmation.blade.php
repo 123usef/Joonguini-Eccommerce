@@ -104,8 +104,9 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ $item->product->image_url }}" alt="{{ $item->product->name }}" 
-                                                     class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                <img src="{{ $item->product->image_url ?: '/images/placeholder-product.svg' }}" alt="{{ $item->product->name }}" 
+                                                     class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;"
+                                                     onerror="this.src='/images/placeholder-product.svg'">
                                                 <div>
                                                     <h6 class="mb-0">{{ $item->product->name }}</h6>
                                                     <small class="text-muted">{{ $item->product->category->name ?? 'Uncategorized' }}</small>

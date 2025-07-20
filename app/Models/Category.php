@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Services\ImageService;
 
 class Category extends Model
 {
@@ -34,15 +33,15 @@ class Category extends Model
         return $query->where('is_active', true);
     }
 
-    // Image handling methods
+    // Image handling methods - Voyager will handle image URLs
     public function getImageUrlAttribute()
     {
-        return ImageService::getCategoryImageUrl($this->image);
+        return $this->image ? asset('storage/' . $this->image) : null;
     }
 
     public function hasImage()
     {
-        return !empty($this->image) && file_exists(public_path('images/' . $this->image));
+        return !empty($this->image);
     }
 
     // Additional helper methods

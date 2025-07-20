@@ -149,11 +149,13 @@
                 <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                     <div class="card h-100 shadow-sm">
                         <div class="position-relative">
-                            <img src="{{ $product->image_url }}" 
-                                 alt="{{ $product->name }}" 
-                                 class="card-img-top" 
-                                 style="height: 200px; object-fit: cover;"
-                                 onerror="this.src='{{ \App\Services\ImageService::getPlaceholderUrl('product', 400, 200) }}'">
+                            <a href="{{ route('products.show', $product->slug) }}">
+                                <img src="{{ $product->image_url ?: '/images/placeholder-product.jpg' }}" 
+                                     alt="{{ $product->name }}" 
+                                     class="card-img-top" 
+                                     style="height: 200px; object-fit: cover;"
+                                     onerror="this.src='/images/placeholder-product.jpg'">
+                            </a>
                             
                             @if($product->quantity <= 5 && $product->quantity > 0)
                                 <span class="badge bg-warning position-absolute top-0 start-0 m-2">
@@ -167,7 +169,11 @@
                         </div>
                         
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ $product->name }}</h5>
+                            <h5 class="card-title">
+                                <a href="{{ route('products.show', $product->slug) }}" class="text-decoration-none text-dark">
+                                    {{ $product->name }}
+                                </a>
+                            </h5>
                             
                             @if($product->category)
                                 <small class="text-muted mb-2">

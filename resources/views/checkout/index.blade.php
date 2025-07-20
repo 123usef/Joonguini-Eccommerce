@@ -26,12 +26,13 @@
                                 @foreach($cartItems as $item)
                                 <div class="row align-items-center mb-3">
                                     <div class="col-2">
-                                        <img src="{{ $item['product']['image_url'] }}" alt="{{ $item['product']['name'] }}" 
-                                             class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                                        <img src="{{ $item['product']->image_url ?: '/images/placeholder-product.svg' }}" alt="{{ $item['product']->name }}" 
+                                             class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;"
+                                             onerror="this.src='/images/placeholder-product.svg'">
                                     </div>
                                     <div class="col-6">
-                                        <h6 class="mb-1">{{ $item['product']['name'] }}</h6>
-                                        <small class="text-muted">{{ number_format($item['product']['price'], 3) }} OMR each</small>
+                                        <h6 class="mb-1">{{ $item['product']->name }}</h6>
+                                        <small class="text-muted">{{ number_format($item['product']->price, 3) }} OMR each</small>
                                     </div>
                                     <div class="col-2 text-center">
                                         <span class="badge bg-secondary">{{ $item['quantity'] }}</span>

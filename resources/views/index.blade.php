@@ -124,8 +124,9 @@
                     <div class="category-card card h-100 shadow-sm border-0">
                         <div class="card-body text-center p-4">
                             <div class="category-icon mb-3">
-                                <img src="{{ $category->image_url }}" alt="{{ $category->name }}" 
-                                     class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                                <img src="{{ $category->image_url ?: '/images/placeholder-category.svg' }}" alt="{{ $category->name }}" 
+                                     class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;"
+                                     onerror="this.src='/images/placeholder-category.svg'">
                             </div>
                             <h5 class="card-title mb-0">{{ $category->name }}</h5>
                         </div>
@@ -154,8 +155,11 @@
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card product-card h-100 shadow-sm border-0">
                     <div class="position-relative overflow-hidden">
-                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
-                             class="card-img-top product-image" style="height: 250px; object-fit: cover;">
+                        <a href="{{ route('products.show', $product->slug) }}">
+                            <img src="{{ $product->image_url ?: '/images/placeholder-product.svg' }}" alt="{{ $product->name }}" 
+                                 class="card-img-top product-image" style="height: 250px; object-fit: cover;"
+                                 onerror="this.src='/images/placeholder-product.svg'">
+                        </a>
                         <div class="product-overlay">
                             <button class="btn btn-primary btn-sm rounded-pill add-to-cart-btn" 
                                     data-product-id="{{ $product->id }}" data-quantity="1">
@@ -167,7 +171,11 @@
                         @endif
                     </div>
                     <div class="card-body">
-                        <h6 class="card-title text-truncate">{{ $product->name }}</h6>
+                        <h6 class="card-title text-truncate">
+                            <a href="{{ route('products.show', $product->slug) }}" class="text-decoration-none text-dark">
+                                {{ $product->name }}
+                            </a>
+                        </h6>
                         <p class="text-muted small mb-2">{{ $product->category->name ?? 'Uncategorized' }}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="h5 mb-0 text-primary">{{ $product->formatted_price }}</span>
@@ -217,8 +225,11 @@
             <div class="col-lg-3 col-md-6 mb-4">
                 <div class="card product-card h-100 shadow-sm border-0">
                     <div class="position-relative overflow-hidden">
-                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
-                             class="card-img-top product-image" style="height: 250px; object-fit: cover;">
+                        <a href="{{ route('products.show', $product->slug) }}">
+                            <img src="{{ $product->image_url ?: '/images/placeholder-product.svg' }}" alt="{{ $product->name }}" 
+                                 class="card-img-top product-image" style="height: 250px; object-fit: cover;"
+                                 onerror="this.src='/images/placeholder-product.svg'">
+                        </a>
                         <div class="product-overlay">
                             <button class="btn btn-primary btn-sm rounded-pill add-to-cart-btn" 
                                     data-product-id="{{ $product->id }}" data-quantity="1">

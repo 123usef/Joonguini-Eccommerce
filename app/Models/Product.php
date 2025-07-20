@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Services\ImageService;
 
 class Product extends Model
 {
@@ -54,20 +53,15 @@ class Product extends Model
         return $query->where('quantity', '>', 0);
     }
 
-    // Image handling methods
+    // Image handling methods - Voyager will handle image URLs
     public function getImageUrlAttribute()
     {
-        return ImageService::getProductImageUrl($this->image);
-    }
-
-    public function getImageThumbnailAttribute()
-    {
-        return ImageService::getProductImageUrl($this->image);
+        return $this->image ? asset('storage/' . $this->image) : null;
     }
 
     public function hasImage()
     {
-        return !empty($this->image) && file_exists(public_path('images/' . $this->image));
+        return !empty($this->image);
     }
 
     // Additional helper methods

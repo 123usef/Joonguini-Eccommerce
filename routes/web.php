@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
 
 // Public Routes
 Route::get('/products', [ProductController::class, 'index'])->name('products');
+Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
 Route::get('/categories/{slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/privacy-policy', [StaticController::class, 'privacyPolicy'])->name('privacy-policy');
